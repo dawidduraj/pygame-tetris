@@ -1,4 +1,5 @@
 import pygame
+import random
 
 # tetromino class
 class Tetromino:
@@ -27,7 +28,16 @@ class Tetromino:
     def __init__(self,_x,_y):
         self.x = _x
         self.y = _y
+        self.type = random.randrange(0,len(self.types))
+        self.color = COLORS[self.type]
+        self.rotation = 0
+    
+    def rotate(self):
+        # Modulo caps the rotation between 0 and the index of the last element in the array
+        self.rotation = (self.rotation + 1) % len(self.types[self.type])
 
+    def display(self):
+        return self.types[self.type][self.rotation]
 
 # Tetris class
 class Tetris:
