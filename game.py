@@ -1,4 +1,3 @@
-from email.header import Header
 import pygame
 import random
 
