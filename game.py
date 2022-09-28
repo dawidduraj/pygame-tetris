@@ -24,11 +24,16 @@ class Tetris:
             self.field.append(row)
 
 # variables/constants
-WIDTH = 300
-HEIGHT = 600
+WIDTH = 600
+HEIGHT = 660
+CELLSIZE = 30
 FPS = 20
+COLORS = {
+    "BACKGROUND": (0,0,0),
+    "GRID": (128,128,128)
+}
 
-game = Tetris()
+game = Tetris(10,20)
 gameover = False
 
 # setup
@@ -42,7 +47,15 @@ while not gameover:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             gameover = True
+
+    window.fill(COLORS["BACKGROUND"])
+
+    # draw grid
+    for i in range(0, game.rows):
+        for j in range(0, game.columns):
+            pygame.draw.rect(window, COLORS["GRID"],[ i*CELLSIZE + CELLSIZE, j*CELLSIZE + CELLSIZE, CELLSIZE, CELLSIZE],1)
     
+    pygame.display.flip()
     clock.tick(FPS)
 
 pygame.quit()
