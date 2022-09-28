@@ -46,6 +46,7 @@ class Tetris:
     field = []
     score = 0
     state = "start"
+    tetromino = None
     
     def __init__(self, _rows, _columns):
         self.rows = _rows
@@ -54,6 +55,7 @@ class Tetris:
         self.score = 0
         self.state = "start"
 
+
         # create empty field
         for i in range(_rows):
             row = []
@@ -61,15 +63,19 @@ class Tetris:
                 # empty field is defined with -1
                 row.append(-1)
             self.field.append(row)
+        self.spawnTetromino()
         
-        # testing
-        self.field[1][3] = 1
+    def spawnTetromino(self):
+            self.tetromino = Tetromino(3,0)
+    
+    def Fall(self):
+        self.tetromino.y += 1
 
 # variables/constants
 WIDTH = 600
 HEIGHT = 660
 CELLSIZE = 30
-FPS = 20
+FPS = 1
 COLORS = {
     "BACKGROUND": (0,0,0),
     "GRID": (128,128,128),
@@ -103,15 +109,9 @@ pygame.display.set_caption("Tetris 🕹️")
 window = pygame.display.set_mode((WIDTH,HEIGHT))
 clock = pygame.time.Clock()
 
-# game loop
-while not gameover:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            gameover = True
+def drawGrid():
 
-    window.fill(COLORS["BACKGROUND"])
-
-    # draw grid
+    # draw empty grid
     for i in range(0, game.rows):
         for j in range(0, game.columns):
             if game.field[i][j] == -1:
@@ -119,6 +119,24 @@ while not gameover:
             else:
                 pygame.draw.rect(window, COLORS[game.field[i][j]],[ i*CELLSIZE + CELLSIZE, j*CELLSIZE + CELLSIZE, CELLSIZE, CELLSIZE])
     
+    # draw tetromino
+    if game.tetromino:
+        for i in range(4):
+            for j in range(4):
+                scan = i * 4 + j
+                if scan in game.tetromino.display():
+                    pygame.draw.rect(window,game.tetromino.color,[ (j + game.tetromino.x)*CELLSIZE + CELLSIZE, (i + game.tetromino.y)*CELLSIZE + CELLSIZE, CELLSIZE, CELLSIZE])
+
+# game loop
+while not gameover:
+    if game.state == "start":
+        game.Fall()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            gameover = True
+
+    window.fill(COLORS["BACKGROUND"]) 
+    drawGrid()
     pygame.display.flip()
     clock.tick(FPS)
 
