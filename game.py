@@ -1,3 +1,4 @@
+from email.header import Header
 import pygame
 import random
 
@@ -77,9 +78,9 @@ class Tetris:
                 scan = i * 4 + j
                 if scan in self.tetromino.display():
                     self.field[i + self.tetromino.y][j + self.tetromino.x] = self.tetromino.type
+        self.breakLines()
         self.spawnTetromino()
         if self.intersects():
-            self.tetromino = None
             self.state = "gameover"
             gameover = True
     
@@ -124,6 +125,38 @@ class Tetris:
                         return True
         return False
 
+    def breakLines(self):
+        lines = 0
+
+        for i in range(1, self.rows):
+            empty = 0
+            for j in range(self.columns):
+                if self.field[i][j] == -1:
+                    empty += 1
+
+            if empty == 0:
+                lines += 1
+                for i2 in range(i, 1, -1):
+                    for j in range(self.columns):
+                        self.field[i2][j] = self.field[i2 - 1][j]
+        self.score += lines ** 2
+
+#        lines = 0
+ #       for i in range(1,self.rows):
+  #          empty = 0
+   #         for j in range(self.columns):
+    #            if self.field[i][j] == -1:
+     #               empty += 1
+      #      
+       #     if empty == 0:
+        #        lines +=1
+         #       for k in range(i, 1 -1):
+          #          for j in range(self.columns):
+           #             self.field[k][j] = self.field[k-1][j]
+        #self.score += lines ** 2 """
+
+
+
 # variables/constants
 WIDTH = 600
 HEIGHT = 660
@@ -132,6 +165,7 @@ FPS = 3
 COLORS = {
     "BACKGROUND": (0,0,0),
     "GRID": (128,128,128),
+    "TEXT": (0,0,180),
     0: (0, 240, 240),      # cyan -> ####
 
     1: (0, 0, 240),        # blue   -> #
@@ -161,6 +195,9 @@ pygame.init()
 pygame.display.set_caption("Tetris 🕹️")
 window = pygame.display.set_mode((WIDTH,HEIGHT))
 clock = pygame.time.Clock()
+headerFont = pygame.font.SysFont('Arial', 32, True,False)
+header = headerFont.render("Tetris!", True,COLORS["TEXT"])
+scoreFont = pygame.font.SysFont('Arial', 28, False,False)
 
 def drawGrid():
 
@@ -182,7 +219,9 @@ def drawGrid():
 
 # game loop
 while not gameover:
+    window.fill(COLORS["BACKGROUND"]) 
     if game.state == "start":
+        header = headerFont.render("Tetris!", True,COLORS["TEXT"])
         game.fall()
     for event in pygame.event.get():
 
@@ -199,7 +238,12 @@ while not gameover:
             if event.key == pygame.K_DOWN:
                 game.fall()
 
-    window.fill(COLORS["BACKGROUND"]) 
+    if game.state == "gameover":
+        header = headerFont.render("GAME OVER!", True,COLORS["TEXT"])
+
+    window.blit(header, [game.columns * CELLSIZE + 2 * CELLSIZE, CELLSIZE])
+    scoreText = scoreFont.render("Score: " + str(game.score), True,COLORS["TEXT"])
+    window.blit(scoreText, [game.columns * CELLSIZE + 2 * CELLSIZE, CELLSIZE * 2])
     drawGrid()
     pygame.display.flip()
     clock.tick(FPS)
