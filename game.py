@@ -1,5 +1,34 @@
 import pygame
 
+# tetromino class
+class Tetromino:
+    x = 0
+    y = 0
+    type = [0][0]
+
+    # Every type of tetromino in every rotation
+    types = [
+        # I
+        [[1, 5, 9, 13], [4, 5, 6, 7]],
+        # J 
+        [[0, 4, 5, 6],   [1, 2, 5, 9], [1, 5, 9, 8], [4, 5, 6, 10]],
+        # L
+        [[1, 2, 6, 10], [5, 6, 7, 9], [2, 6, 10, 11], [3, 5, 6, 7]],
+        # O
+        [[1, 2, 5, 6]],
+        # S 
+        [[6, 7, 9, 10], [1, 5, 6, 10]],
+        # T
+        [[1, 4, 5, 6], [1, 4, 5, 9], [4, 5, 6, 9], [1, 5, 6, 9]],
+        # Z 
+        [[4, 5, 9, 10], [2, 6, 5, 9]]
+    ]
+
+    def __init__(self,_x,_y):
+        self.x = _x
+        self.y = _y
+
+
 # Tetris class
 class Tetris:
     rows = 0
