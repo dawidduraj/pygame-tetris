@@ -31,10 +31,6 @@ class Tetromino:
         self.type = random.randrange(0,len(self.types))
         self.color = COLORS[self.type]
         self.rotation = 0
-    
-    def rotate(self):
-        # Modulo caps the rotation between 0 and the index of the last element in the array
-        self.rotation = (self.rotation + 1) % len(self.types[self.type])
 
     def display(self):
         return self.types[self.type][self.rotation]
@@ -48,9 +44,9 @@ class Tetris:
     state = "start"
     tetromino = None
     
-    def __init__(self, _rows, _columns):
-        self.rows = _rows
+    def __init__(self,_columns,_rows):
         self.columns = _columns
+        self.rows = _rows
         self.field = []
         self.score = 0
         self.state = "start"
@@ -70,9 +66,63 @@ class Tetris:
     
     def fall(self):
         self.tetromino.y += 1
+        if self.intersects():
+            self.tetromino.y -= 1
+            self.freeze()
+
+    def freeze(self):
+        global gameover
+        for i in range(4):
+            for j in range(4):
+                scan = i * 4 + j
+                if scan in self.tetromino.display():
+                    self.field[i + self.tetromino.y][j + self.tetromino.x] = self.tetromino.type
+        self.spawnTetromino()
+        if self.intersects():
+            self.tetromino = None
+            self.state = "gameover"
+            gameover = True
     
     def moveX(self,dir):
-        self.tetromino.x += dir
+        _x = self.tetromino.x
+        edge = False
+
+        for i in range(4):
+            for j in range(4):
+                scan = i * 4 + j
+                if scan in self.tetromino.display():
+                    if j + self.tetromino.x + dir > self.columns - 1 or \
+                       j + self.tetromino.x + dir < 0:
+                        edge = True
+        if not edge:
+            self.tetromino.x += dir
+        
+        if self.intersects():
+            self.tetromino.x = _x
+        
+
+    def rotate(self):
+        _rotation = self.tetromino.rotation
+        # Modulo caps the rotation between 0 and the index of the last element in the array
+        self.tetromino.rotation = (self.tetromino.rotation + 1) % len(self.tetromino.types[self.tetromino.type])
+        if self.intersects():
+            self.tetromino.rotation = _rotation
+
+    def intersects(self):
+        for i in range(4):
+            for j in range(4):
+                scan = i * 4 + j
+                if scan in self.tetromino.display():
+                    try:
+                        if i + self.tetromino.y > self.rows - 1 or \
+                           i + self.tetromino.y < 0 or \
+                           j + self.tetromino.x > self.columns or \
+                           j + self.tetromino.x < 0 or \
+                           self.field[i + self.tetromino.y][j + self.tetromino.x] >= 0:
+                            return True
+                    except IndexError:
+                        return True
+        return False
 
 # variables/constants
 WIDTH = 600
@@ -118,9 +168,9 @@ def drawGrid():
     for i in range(0, game.rows):
         for j in range(0, game.columns):
             if game.field[i][j] == -1:
-                pygame.draw.rect(window, COLORS["GRID"],[ i*CELLSIZE + CELLSIZE, j*CELLSIZE + CELLSIZE, CELLSIZE, CELLSIZE],1)
+                pygame.draw.rect(window, COLORS["GRID"],[ j*CELLSIZE + CELLSIZE, i*CELLSIZE + CELLSIZE, CELLSIZE, CELLSIZE],1)
             else:
-                pygame.draw.rect(window, COLORS[game.field[i][j]],[ i*CELLSIZE + CELLSIZE, j*CELLSIZE + CELLSIZE, CELLSIZE, CELLSIZE])
+                pygame.draw.rect(window, COLORS[game.field[i][j]],[ j*CELLSIZE + CELLSIZE, i*CELLSIZE + CELLSIZE, CELLSIZE, CELLSIZE])
     
     # draw tetromino
     if game.tetromino:
@@ -145,8 +195,7 @@ while not gameover:
             if event.key == pygame.K_LEFT:
                 game.moveX(-1)
             if event.key == pygame.K_UP:
-                game.tetromino.rotate()
-        
+                game.rotate()
 
     window.fill(COLORS["BACKGROUND"]) 
     drawGrid()
