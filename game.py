@@ -68,14 +68,17 @@ class Tetris:
     def spawnTetromino(self):
             self.tetromino = Tetromino(3,0)
     
-    def Fall(self):
+    def fall(self):
         self.tetromino.y += 1
+    
+    def moveX(self,dir):
+        self.tetromino.x += dir
 
 # variables/constants
 WIDTH = 600
 HEIGHT = 660
 CELLSIZE = 30
-FPS = 1
+FPS = 3
 COLORS = {
     "BACKGROUND": (0,0,0),
     "GRID": (128,128,128),
@@ -130,10 +133,20 @@ def drawGrid():
 # game loop
 while not gameover:
     if game.state == "start":
-        game.Fall()
+        game.fall()
     for event in pygame.event.get():
+
         if event.type == pygame.QUIT:
             gameover = True
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RIGHT:
+                game.moveX(1)
+            if event.key == pygame.K_LEFT:
+                game.moveX(-1)
+            if event.key == pygame.K_UP:
+                game.tetromino.rotate()
+        
 
     window.fill(COLORS["BACKGROUND"]) 
     drawGrid()
