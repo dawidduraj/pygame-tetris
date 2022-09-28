@@ -141,22 +141,6 @@ class Tetris:
                         self.field[i2][j] = self.field[i2 - 1][j]
         self.score += lines ** 2
 
-#        lines = 0
- #       for i in range(1,self.rows):
-  #          empty = 0
-   #         for j in range(self.columns):
-    #            if self.field[i][j] == -1:
-     #               empty += 1
-      #      
-       #     if empty == 0:
-        #        lines +=1
-         #       for k in range(i, 1 -1):
-          #          for j in range(self.columns):
-           #             self.field[k][j] = self.field[k-1][j]
-        #self.score += lines ** 2 """
-
-
-
 # variables/constants
 WIDTH = 600
 HEIGHT = 660
