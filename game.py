@@ -196,6 +196,8 @@ while not gameover:
                 game.moveX(-1)
             if event.key == pygame.K_UP:
                 game.rotate()
+            if event.key == pygame.K_DOWN:
+                game.fall()
 
     window.fill(COLORS["BACKGROUND"]) 
     drawGrid()
